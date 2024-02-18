@@ -140,7 +140,8 @@ public class SellerJDBC implements SellerDao {
     }
   }
 
-  public List<Seller> findByDepartment(Integer departmentId) {
+  @Override
+  public List<Seller> findByDepartment(Department department) {
     ResultSet result = null;
     Statement statement = null;
 
@@ -150,13 +151,9 @@ public class SellerJDBC implements SellerDao {
       statement = connection.createStatement();
 
       result = statement
-          .executeQuery(SQLQuery.getList(TABLE_NAME, columnsSelect, "WHERE DepartmentId = " + departmentId, this.joins,
-              null, "ORDER BY Name ASC"));
-
-      Department department = null;
-      if (result.next()) {
-        department = this.instantiateDepartment(result);
-      }
+          .executeQuery(
+              SQLQuery.getList(TABLE_NAME, columnsSelect, "WHERE DepartmentId = " + department.getId(), this.joins,
+                  null, "ORDER BY Name ASC"));
 
       while (result.next()) {
         list.add(this.instantiateSeller(result, department));
