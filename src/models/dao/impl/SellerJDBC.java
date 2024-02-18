@@ -101,15 +101,7 @@ public class SellerJDBC implements SellerDao {
           this.joins));
 
       if (result.next()) {
-        String name = result.getString("Name");
-        String email = result.getString("Email");
-        Date birthDate = result.getDate("BirthDate");
-        Double baseSalary = result.getDouble("BaseSalary");
-        Integer departmentId = result.getInt("DepartmentId");
-        String departmentName = result.getString("DepartmentName");
-        Department department = new Department(departmentId, departmentName);
-
-        return new Seller(id, name, email, birthDate, baseSalary, department);
+        return this.instantiateSeller(result, this.instantiateDepartment(result));
       }
 
       return null;
@@ -135,18 +127,7 @@ public class SellerJDBC implements SellerDao {
           this.joins, null));
 
       while (result.next()) {
-        Integer id = result.getInt("Id");
-        String name = result.getString("Name");
-        String email = result.getString("Email");
-        Date birthDate = result.getDate("BirthDate");
-        Double baseSalary = result.getDouble("BaseSalary");
-        Integer departmentId = result.getInt("DepartmentId");
-        String departmentName = result.getString("DepartmentName");
-        Department department = new Department(departmentId, departmentName);
-
-        Seller seller = new Seller(id, name, email, birthDate, baseSalary, department);
-
-        list.add(seller);
+        list.add(this.instantiateSeller(result, this.instantiateDepartment(result)));
       }
 
       return list;
@@ -156,6 +137,22 @@ public class SellerJDBC implements SellerDao {
       DB.closeStatement(stt);
       DB.closeResultSet(result);
     }
+  }
+
+  private Department instantiateDepartment(ResultSet resultSet) throws SQLException {
+    Integer departmentId = resultSet.getInt("DepartmentId");
+    String departmentName = resultSet.getString("DepartmentName");
+    return new Department(departmentId, departmentName);
+  }
+
+  private Seller instantiateSeller(ResultSet resultSet, Department department) throws SQLException {
+    Integer id = resultSet.getInt("Id");
+    String name = resultSet.getString("Name");
+    String email = resultSet.getString("Email");
+    Date birthDate = resultSet.getDate("BirthDate");
+    Double baseSalary = resultSet.getDouble("BaseSalary");
+
+    return new Seller(id, name, email, birthDate, baseSalary, department);
   }
 
 }
