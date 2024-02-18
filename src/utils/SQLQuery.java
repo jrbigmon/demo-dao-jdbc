@@ -3,15 +3,15 @@ package utils;
 import java.util.Arrays;
 
 public class SQLQuery {
-  private SQLQuery() {
+  protected SQLQuery() {
     throw new IllegalStateException("SQLQuery is not initialized");
   }
 
-  private static String replaceBrackets(String value) {
+  protected static String replaceBrackets(String value) {
     return value.replace("[", "").replace("]", "");
   }
 
-  private static String getReplacements(Integer columnsLength) {
+  protected static String getReplacements(Integer columnsLength) {
     String replacements = "(";
 
     for (int i = 0; i < columnsLength; i++) {
@@ -24,7 +24,7 @@ public class SQLQuery {
     return replacements += ")";
   }
 
-  private static String getReplacementsToUpdate(String[] columns) {
+  protected static String getReplacementsToUpdate(String[] columns) {
     Integer columnsLength = columns.length;
     String replacements = "";
 
@@ -89,7 +89,7 @@ public class SQLQuery {
 
   public static String getById(Integer id, String tableName, String[] columns, String[] joins) {
     if (tableName == null) {
-      throw new IllegalArgumentException("tableName is required");
+      throw new IllegalArgumentException("tableName cannot be null");
     }
 
     String columnsString = columns != null ? replaceBrackets(Arrays.toString(columns)) : "*";
