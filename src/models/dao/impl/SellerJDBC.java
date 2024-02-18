@@ -58,7 +58,8 @@ public class SellerJDBC implements SellerDao {
     PreparedStatement preparedStatement = null;
 
     try {
-      preparedStatement = connection.prepareStatement(SQLQuery.updateById(TABLE_NAME, columnsUpdate, seller.getId()));
+      preparedStatement = connection
+          .prepareStatement(SQLQuery.updateById(TABLE_NAME, columnsUpdate, seller.getId()));
 
       preparedStatement.setString(1, seller.getName());
       preparedStatement.setString(2, seller.getEmail());
@@ -115,16 +116,16 @@ public class SellerJDBC implements SellerDao {
 
   @Override
   public List<Seller> findAll() {
-    Statement stt = null;
+    Statement statement = null;
     ResultSet result = null;
 
     try {
       List<Seller> list = new ArrayList<>();
 
-      stt = connection.createStatement();
+      statement = connection.createStatement();
 
-      result = stt.executeQuery(SQLQuery.getList(TABLE_NAME, this.columnsSelect, null,
-          this.joins, null));
+      result = statement.executeQuery(SQLQuery.getList(TABLE_NAME, this.columnsSelect, null,
+          this.joins, null, null));
 
       while (result.next()) {
         list.add(this.instantiateSeller(result, this.instantiateDepartment(result)));
@@ -134,8 +135,39 @@ public class SellerJDBC implements SellerDao {
     } catch (SQLException e) {
       throw new DbException(e.getMessage());
     } finally {
-      DB.closeStatement(stt);
+      DB.closeStatement(statement);
       DB.closeResultSet(result);
+    }
+  }
+
+  public List<Seller> findByDepartment(Integer departmentId) {
+    ResultSet result = null;
+    Statement statement = null;
+
+    try {
+      List<Seller> list = new ArrayList<>();
+
+      statement = connection.createStatement();
+
+      result = statement
+          .executeQuery(SQLQuery.getList(TABLE_NAME, columnsSelect, "WHERE DepartmentId = " + departmentId, this.joins,
+              null, "ORDER BY Name ASC"));
+
+      Department department = null;
+      if (result.next()) {
+        department = this.instantiateDepartment(result);
+      }
+
+      while (result.next()) {
+        list.add(this.instantiateSeller(result, department));
+      }
+
+      return list;
+    } catch (Exception e) {
+      throw new DbException(e.getMessage());
+    } finally {
+      DB.closeResultSet(result);
+      DB.closeStatement(statement);
     }
   }
 
