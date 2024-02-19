@@ -129,8 +129,17 @@ public class SellerJDBC implements SellerDao {
       result = statement.executeQuery(SQLQuery.getList(TABLE_NAME, this.columnsSelect, null,
           this.joins, null, null));
 
+      Map<Integer, Department> mapDepartment = new HashMap<>();
+
       while (result.next()) {
-        list.add(this.instantiateSeller(result, this.instantiateDepartment(result)));
+        Department instantiatedDepartment = mapDepartment.get(result.getInt("DepartmentId"));
+
+        if (instantiatedDepartment == null) {
+          instantiatedDepartment = this.instantiateDepartment(result);
+          mapDepartment.put(instantiatedDepartment.getId(), instantiatedDepartment);
+        }
+
+        list.add(this.instantiateSeller(result, instantiatedDepartment));
       }
 
       return list;
