@@ -6,9 +6,9 @@ import models.entities.Department;
 import models.entities.Seller;
 
 public interface SellerDao {
-  void insert(Seller seller);
+  Integer insert(Seller seller);
 
-  void update(Seller seller);
+  Boolean update(Seller seller);
 
   void deleteById(Integer id);
 

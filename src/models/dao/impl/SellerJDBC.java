@@ -39,15 +39,32 @@ public class SellerJDBC implements SellerDao {
   }
 
   @Override
-  public void insert(Seller seller) {
+  public Integer insert(Seller seller) {
     PreparedStatement preparedStatement = null;
+    ResultSet result = null;
+
     try {
-      preparedStatement = connection.prepareStatement(SQLQuery.create(TABLE_NAME, columnsInsert));
+      preparedStatement = connection.prepareStatement(SQLQuery.create(TABLE_NAME, columnsInsert),
+          Statement.RETURN_GENERATED_KEYS);
       preparedStatement.setString(1, seller.getName());
       preparedStatement.setString(2, seller.getEmail());
       preparedStatement.setDate(3, new java.sql.Date(sdf.parse(seller.getBirthDate().toString()).getTime()));
       preparedStatement.setDouble(4, seller.getBaseSalary());
       preparedStatement.setInt(5, seller.getDepartment().getId());
+
+      Integer rowsEffected = preparedStatement.executeUpdate();
+
+      Integer id = null;
+
+      if (rowsEffected > 0) {
+        result = preparedStatement.getGeneratedKeys();
+
+        while (result.next()) {
+          id = result.getInt(1);
+        }
+      }
+
+      return id;
     } catch (SQLException | ParseException e) {
       throw new DbException(e.getMessage());
     } finally {
@@ -56,7 +73,7 @@ public class SellerJDBC implements SellerDao {
   }
 
   @Override
-  public void update(Seller seller) {
+  public Boolean update(Seller seller) {
     PreparedStatement preparedStatement = null;
 
     try {
@@ -69,7 +86,9 @@ public class SellerJDBC implements SellerDao {
       preparedStatement.setDouble(4, seller.getBaseSalary());
       preparedStatement.setInt(5, seller.getDepartment().getId());
 
-      preparedStatement.executeUpdate();
+      Integer rowsAffected = preparedStatement.executeUpdate();
+
+      return rowsAffected > 0;
     } catch (Exception e) {
       throw new DbException(e.getMessage());
     } finally {
