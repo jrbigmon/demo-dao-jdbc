@@ -48,24 +48,25 @@ public class SellerJDBC implements SellerDao {
           Statement.RETURN_GENERATED_KEYS);
       preparedStatement.setString(1, seller.getName());
       preparedStatement.setString(2, seller.getEmail());
-      preparedStatement.setDate(3, new java.sql.Date(sdf.parse(seller.getBirthDate().toString()).getTime()));
+      preparedStatement.setDate(3, new java.sql.Date(seller.getBirthDate().getTime()));
       preparedStatement.setDouble(4, seller.getBaseSalary());
       preparedStatement.setInt(5, seller.getDepartment().getId());
 
       Integer rowsEffected = preparedStatement.executeUpdate();
 
-      Integer id = null;
-
       if (rowsEffected > 0) {
         result = preparedStatement.getGeneratedKeys();
 
         while (result.next()) {
-          id = result.getInt(1);
+          Integer id = result.getInt(1);
+          seller.setId(id);
         }
+      } else {
+        throw new DbException("Error unexpected");
       }
 
-      return id;
-    } catch (SQLException | ParseException e) {
+      return seller.getId();
+    } catch (SQLException e) {
       throw new DbException(e.getMessage());
     } finally {
       DB.closeStatement(preparedStatement);

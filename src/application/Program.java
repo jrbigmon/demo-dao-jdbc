@@ -1,5 +1,11 @@
 package application;
 
+import java.text.DateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAccessor;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import models.dao.DaoFactory;
@@ -27,5 +33,22 @@ public class Program {
         System.out.println("--- TEST findAll ---");
         sellers = sellerDao.findAll();
         sellers.forEach(System.out::println);
+
+        System.out.println();
+
+        System.out.println("--- TEST insert ---");
+        String name = "Aretha";
+        String email = "aretha@gmail.com";
+        Date birthDate = new Date();
+        Double baseSalary = 3000.00;
+
+        seller = new Seller(null, name, email, birthDate, baseSalary, department);
+
+        Integer sellerId = sellerDao.insert(seller);
+
+        System.out.println("sellerId: " + sellerId);
+
+        seller = sellerDao.findById(sellerId);
+        System.out.println("Seller in database: " + seller);
     }
 }
