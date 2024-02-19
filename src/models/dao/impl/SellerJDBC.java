@@ -9,7 +9,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import db.DB;
 import db.DbException;
@@ -155,8 +157,17 @@ public class SellerJDBC implements SellerDao {
               SQLQuery.getList(TABLE_NAME, columnsSelect, "WHERE DepartmentId = " + department.getId(), this.joins,
                   null, "ORDER BY Name ASC"));
 
+      Map<Integer, Department> mapDepartment = new HashMap<>();
+
       while (result.next()) {
-        list.add(this.instantiateSeller(result, department));
+        Department instantiatedDepartment = mapDepartment.get(result.getInt("DepartmentId"));
+
+        if (instantiatedDepartment == null) {
+          instantiatedDepartment = this.instantiateDepartment(result);
+          mapDepartment.put(instantiatedDepartment.getId(), instantiatedDepartment);
+        }
+
+        list.add(this.instantiateSeller(result, instantiatedDepartment));
       }
 
       return list;
