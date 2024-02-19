@@ -21,5 +21,11 @@ public class Program {
         Department department = new Department(1, "Computers");
         List<Seller> sellers = sellerDao.findByDepartment(department);
         sellers.forEach(System.out::println);
+
+        System.out.println();
+
+        System.out.println("--- TEST findAll ---");
+        sellers = sellerDao.findAll();
+        sellers.forEach(System.out::println);
     }
 }
